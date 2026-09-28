@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "build:html": "node build.js",
-    "build:css": "npx @tailwindcss/cli -i ./src/css/input.css -o ./public/assets/css/style.css --minify && node -e \"fs.copyFileSync('./public/assets/css/style.css', './public/css/style.css')\"",
+    "build:css": "npx @tailwindcss/cli -i ./src/css/input.css -o ./public/assets/css/style.css --minify",
     "build": "npm run build:html && npm run build:css",
     "watch": "node watch.js"
   },
