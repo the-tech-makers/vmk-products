@@ -1,0 +1,63 @@
+<dialog id="lead" class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl p-0 shadow-2xl backdrop:bg-ink/60" aria-labelledby="leadTitle">
+  <div class="p-6 sm:p-7">
+    <div class="flex items-start justify-between gap-4">
+      <div><h2 id="leadTitle" class="text-xl font-extrabold text-deep">Get the VMK Product Portfolio</h2><p class="mt-1 text-sm">Share your details and download it instantly.</p></div>
+      <button type="button" id="leadClose" class="-m-1 rounded-lg p-1 text-slate-500 hover:text-deep" aria-label="Close"><svg class="ic h-6 w-6" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <form id="leadForm" class="mt-5 space-y-4">
+      <label class="block text-sm font-semibold text-deep">Name<input name="name" required autocomplete="name" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 font-normal focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></label>
+      <label class="block text-sm font-semibold text-deep">Phone<input name="phone" type="tel" required pattern="[0-9+\s\-]{10,15}" inputmode="tel" autocomplete="tel" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 font-normal focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></label>
+      <label class="block text-sm font-semibold text-deep">Email<input name="email" type="email" required autocomplete="email" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 font-normal focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"></label>
+      <label class="block text-sm font-semibold text-deep">Interested in
+        <select name="category" id="leadCat" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-normal focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30">
+          <option>Complete product range</option><option>Smart Switches</option><option>Smart Lighting</option><option>Smart Plugs &amp; Power</option><option>Smart Door Locks</option><option>Smart Sensors</option><option>Smart Curtains</option><option>Home Security</option><option>Video Doorbells</option>
+        </select>
+      </label>
+      <button type="submit" id="leadSubmit" class="w-full rounded-lg bg-brand px-4 py-3 font-bold text-white transition hover:bg-deep disabled:opacity-60">Get Product Portfolio</button>
+      <p id="leadErr" class="hidden text-sm text-red-600">Something went wrong. Please try again or call +91 85270 87270.</p>
+    </form>
+    <div id="leadOk" class="hidden py-4 text-center">
+      <span class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-leaf/15 text-leaf"><svg class="ic h-7 w-7" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+      <h3 class="mt-4 text-lg font-extrabold text-deep">Thank you! Your portfolio is ready.</h3>
+      <a id="leadDl" href="#" download class="mt-5 inline-flex items-center gap-2 rounded-lg bg-brand px-5 py-3 font-bold text-white hover:bg-deep"><svg class="ic h-5 w-5" viewBox="0 0 24 24"><use href="#i-down"/></svg>Download Product Portfolio</a>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  // Set these before launch
+  const CONFIG = {
+    portfolioUrl: 'downloads/vmk-product-portfolio.pdf', // path to your PDF
+    endpoint: ''                                          // your form/CRM/email endpoint (POST, JSON)
+  };
+
+  const $ = (s) => document.querySelector(s);
+  const dlg = $('#lead'), form = $('#leadForm'), ok = $('#leadOk'), err = $('#leadErr'), btn = $('#leadSubmit');
+
+  document.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => {
+    form.classList.remove('hidden'); ok.classList.add('hidden'); err.classList.add('hidden');
+    $('#leadCat').value = b.dataset.cat || 'Complete product range';
+    dlg.showModal();
+  }));
+  $('#leadClose').addEventListener('click', () => dlg.close());
+  dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    btn.disabled = true; btn.textContent = 'Sending…'; err.classList.add('hidden');
+    try {
+      if (CONFIG.endpoint) {
+        const res = await fetch(CONFIG.endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(form))) });
+        if (!res.ok) throw new Error('bad status');
+      }
+      $('#leadDl').href = CONFIG.portfolioUrl;
+      form.classList.add('hidden'); ok.classList.remove('hidden');
+      if (window.gtag) gtag('event', 'generate_lead'); // hook your Google Ads conversion here
+    } catch (_) { err.classList.remove('hidden'); }
+    btn.disabled = false; btn.textContent = 'Get Product Portfolio';
+  });
+
+  const mBtn = $('#menuBtn'), menu = $('#mobileMenu');
+  mBtn.addEventListener('click', () => { const o = menu.classList.toggle('hidden') === false; mBtn.setAttribute('aria-expanded', o); });
+  menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => { menu.classList.add('hidden'); mBtn.setAttribute('aria-expanded', 'false'); }));
+</script>

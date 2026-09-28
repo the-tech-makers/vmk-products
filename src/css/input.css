@@ -1,0 +1,13 @@
+@config "../../tailwind.config.js";
+@import "tailwindcss";
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; }
+@media (prefers-reduced-motion: reduce) {
+* { animation: none !important; transition: none !important; }
+}
+.reveal { opacity: 0; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.in { opacity: 1; transform: translateY(0); }
+details > summary { list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
+svg.fill-currentColor{fill:currentColor;}
