@@ -32,16 +32,6 @@ function copyAssets() {
             console.log(`✓ js/${file} → public/assets/js/${file}`);
         }
     }
-
-    const srcCssFile = path.join(PUBLIC_DIR, "assets", "css", "style.css");
-    const destCssDir = path.join(PUBLIC_DIR, "css");
-    const destCssFile = path.join(destCssDir, "style.css");
-    if (fs.existsSync(srcCssFile)) {
-        if (!fs.existsSync(destCssDir)) {
-            fs.mkdirSync(destCssDir, { recursive: true });
-        }
-        fs.copyFileSync(srcCssFile, destCssFile);
-    }
 }
 
 async function buildHTML() {
