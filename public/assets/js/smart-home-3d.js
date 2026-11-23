@@ -2,7 +2,6 @@ import * as THREE from 'three';
 
 const canvas = document.querySelector('#home-scene');
 const fallback = document.querySelector('.scene-fallback');
-const sceneButtons = [...document.querySelectorAll('.scene-option, [data-scene-trigger]')];
 const statusPill = document.querySelector('.floating-status strong');
 const tempPill = document.querySelector('.floating-temp strong');
 const captionLeft = document.querySelector('.scene-caption span:first-child');
@@ -18,12 +17,12 @@ function initHomeScene() {
 
   try {
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#c6cebe');
-    scene.fog = new THREE.FogExp2('#c6cebe', 0.045);
+    scene.background = new THREE.Color('#cdd7c6');
+    scene.fog = new THREE.FogExp2('#cdd7c6', 0.045);
 
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 80);
-    camera.position.set(9.5, 7.8, 11.2);
-    camera.lookAt(0, 1.2, 0);
+    camera.position.set(9.2, 7.5, 11.2);
+    camera.lookAt(0, 1.1, 0);
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -36,299 +35,261 @@ function initHomeScene() {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 1.18;
 
     // --- Lighting Rig ---
-    const hemiLight = new THREE.HemisphereLight('#fbfaf2', '#586354', 1.8);
+    const hemiLight = new THREE.HemisphereLight('#fdfbf7', '#2a3328', 2.2);
     scene.add(hemiLight);
 
-    const sun = new THREE.DirectionalLight('#fff2da', 3.4);
-    sun.position.set(-6, 10, 7);
+    const sun = new THREE.DirectionalLight('#fff7ed', 3.8);
+    sun.position.set(-6, 11, 7);
     sun.castShadow = true;
-    sun.shadow.mapSize.set(1024, 1024);
+    sun.shadow.mapSize.width = 2048;
+    sun.shadow.mapSize.height = 2048;
     sun.shadow.camera.near = 0.5;
     sun.shadow.camera.far = 30;
     sun.shadow.camera.left = -7;
     sun.shadow.camera.right = 7;
     sun.shadow.camera.top = 7;
     sun.shadow.camera.bottom = -7;
-    sun.shadow.bias = -0.0005;
+    sun.shadow.bias = -0.0004;
     scene.add(sun);
 
-    // Living room ambient / ambilight TV glow
-    const tvLight = new THREE.PointLight('#38bdf8', 0, 8);
-    tvLight.position.set(-1.1, 1.8, -2.1);
-    scene.add(tvLight);
-
-    // Warm ceiling / cove wash light
-    const coveLight = new THREE.PointLight('#fde68a', 0.8, 12);
-    coveLight.position.set(0, 2.7, 0);
+    // Ceiling linear cove light (Warm golden ambient backlight)
+    const coveLight = new THREE.PointLight('#fffbeb', 0.3, 14, 1.2);
+    coveLight.position.set(0, 2.5, -2.8);
     scene.add(coveLight);
 
-    // Kitchen island pendant warm light
-    const islandLight = new THREE.PointLight('#fed7aa', 1.2, 7);
-    islandLight.position.set(1.9, 1.8, -1.2);
+    // Kitchen island pendant illumination
+    const islandLight = new THREE.PointLight('#fff7ed', 0.4, 7, 1.5);
+    islandLight.position.set(2.2, 2.1, -1.6);
     scene.add(islandLight);
 
-    // Bedroom soft lamp light
-    const bedroomLight = new THREE.PointLight('#ffedd5', 0.9, 6);
-    bedroomLight.position.set(-2.8, 1.4, 1.8);
-    scene.add(bedroomLight);
+    // OLED TV Dynamic Ambilight (Living Room Cinema)
+    const tvLight = new THREE.PointLight('#38bdf8', 0, 9, 1.6);
+    tvLight.position.set(0.8, 1.75, -2.4);
+    scene.add(tvLight);
 
-    // Security indicator perimeter light (for Away mode)
-    const securityLight = new THREE.PointLight('#34d399', 0, 9);
-    securityLight.position.set(3.4, 1.6, 0);
+    // Security Indicator Light (Away Mode)
+    const securityLight = new THREE.PointLight('#10b981', 0, 8, 2.0);
+    securityLight.position.set(4.3, 0.4, 0);
     scene.add(securityLight);
 
-    // --- Materials Palette ---
-    const mat = (color, roughness = 0.65, metalness = 0.05) =>
+    // --- Architectural Materials (PBR) ---
+    const mat = (color, roughness = 0.5, metalness = 0.05) =>
       new THREE.MeshStandardMaterial({ color, roughness, metalness });
 
-    const plinthMat = mat('#1e2420', 0.85, 0.1);
-    const floorMat = mat('#ba9572', 0.55, 0.02); // Warm natural chevron oak
-    const wallMat = mat('#edeae0', 0.82, 0);     // Lime wash off-white architectural wall
-    const accentWallMat = mat('#414840', 0.7, 0.05); // Charcoal feature acoustic partition
-    const woodMat = mat('#855b38', 0.6, 0.02);   // Dark walnut
-    const marbleMat = mat('#e8ece9', 0.25, 0.15); // Honed calacatta marble
-    const darkMetal = mat('#1c201d', 0.45, 0.6); // Blackened architectural steel
-    const fabricMat = mat('#dad5c7', 0.9, 0);    // Luxury linen bouclé
-    const cushionMat = mat('#8d9884', 0.85, 0);  // Sage green accent cushion
-    const ochreMat = mat('#c29b4e', 0.8, 0);     // Warm ochre cushion
-    const beddingMat = mat('#f0ece1', 0.95, 0);  // Crisp white cotton bedding
+    const wallMat = mat('#edece6', 0.88, 0.02);
+    const accentWallMat = mat('#232a25', 0.75, 0.08); // Dark fluted feature wall
+    const floorMat = mat('#ab8867', 0.42, 0.12);     // Warm oak hardwood
+    const woodMat = mat('#694d36', 0.65, 0.05);      // Fluted walnut cabinetry
+    const marbleMat = mat('#f5f4f0', 0.22, 0.05);    // Honed Calacatta marble
+    const fabricMat = mat('#d1cec7', 0.94, 0.0);     // Textured bouclé sofa
+    const darkMetal = mat('#181d19', 0.38, 0.7);     // Architectural anodized bronze
+    const cushionMat = mat('#435044', 0.88, 0.0);    // Sage velvet accents
+    const ochreMat = mat('#b88b4a', 0.85, 0.0);      // Warm ochre accents
 
+    // Glass Facade (MeshPhysicalMaterial)
     const glassMat = new THREE.MeshPhysicalMaterial({
-      color: '#c2dedc',
+      color: '#e6f0ea',
+      transparent: true,
+      opacity: 0.35,
       roughness: 0.08,
       metalness: 0.1,
-      transmission: 0.72,
-      thickness: 0.18,
-      transparent: true,
-      opacity: 0.38,
-      reflectivity: 0.6
+      transmission: 0.85,
+      ior: 1.52,
+      thickness: 0.25
     });
 
-    // TV emissive material
+    // TV Screen Emissive Material
     const tvScreenMat = new THREE.MeshStandardMaterial({
-      color: '#080c10',
-      emissive: '#1e293b',
-      emissiveIntensity: 0.2,
-      roughness: 0.2
+      color: '#0a0d0b',
+      emissive: '#0a0d0b',
+      emissiveIntensity: 0.05,
+      roughness: 0.15
     });
 
-    // Smart LED cove strip material
+    // Linear Cove LED Strip
     const ledStripMat = new THREE.MeshStandardMaterial({
-      color: '#fef08a',
-      emissive: '#fef08a',
-      emissiveIntensity: 0.8,
+      color: '#ffffff',
+      emissive: '#fffbeb',
+      emissiveIntensity: 0.2,
       roughness: 0.3
     });
 
-    // Smart device indicator material (switch & security LEDs)
-    const ledDotMat = new THREE.MeshStandardMaterial({
-      color: '#84cc16',
-      emissive: '#84cc16',
-      emissiveIntensity: 1.5,
-      roughness: 0.2
-    });
-
+    // --- Geometry Construction: Architectural Cutaway Residence ---
     const house = new THREE.Group();
     scene.add(house);
 
-    function createBox(parent, name, [w, h, d], [x, y, z], material, cast = true, receive = true) {
-      const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+    const createBox = (parent, name, size, pos, material, cast = true, receive = true) => {
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
       mesh.name = name;
-      mesh.position.set(x, y, z);
+      mesh.position.set(...pos);
       mesh.castShadow = cast;
       mesh.receiveShadow = receive;
       parent.add(mesh);
       return mesh;
-    }
+    };
 
-    // --- Architecture Shell ---
-    // Floating architectural plinth
-    createBox(house, 'sub-foundation', [9.8, 0.35, 7.8], [0, -0.25, 0], plinthMat);
+    // Concrete architectural plinth and hardwood floor
+    createBox(house, 'exterior-plinth', [10.2, 0.25, 8.2], [0, -0.22, 0], mat('#808a7e', 0.9), false, true);
     createBox(house, 'patio-ledge', [9.5, 0.12, 7.4], [0, -0.04, 0], mat('#303732', 0.8));
     createBox(house, 'interior-floor', [9.1, 0.1, 6.9], [0, 0.06, 0], floorMat);
 
-    // Architectural Perimeter Walls (Cutaway Design)
-    // Rear main wall
+    // Architectural Perimeter Walls
     createBox(house, 'rear-wall', [9.1, 2.5, 0.22], [0, 1.35, -3.35], wallMat);
-    // Left side bedroom wall
     createBox(house, 'left-wall', [0.22, 2.5, 6.9], [-4.44, 1.35, 0], wallMat);
-    // Interior divider between Living and Bedroom (slatted feature partition)
+
+    // Slatted feature acoustic divider
     createBox(house, 'interior-partition', [0.18, 2.5, 3.8], [-1.6, 1.35, 1.55], accentWallMat);
     for (let z = -0.1; z <= 3.2; z += 0.35) {
       createBox(house, 'acoustic-slat', [0.04, 2.45, 0.12], [-1.48, 1.35, z], woodMat, false, true);
     }
 
-    // Right exterior corner pillars
+    // Right exterior corner pillars & floor-to-ceiling panoramic glass
     createBox(house, 'right-rear-pillar', [0.28, 2.5, 0.9], [4.41, 1.35, -2.9], wallMat);
     createBox(house, 'right-front-pillar', [0.28, 2.5, 0.9], [4.41, 1.35, 2.9], wallMat);
-
-    // Floor-to-ceiling panoramic glass facade along right wall
     createBox(house, 'panoramic-glass', [0.06, 2.3, 4.8], [4.4, 1.3, 0], glassMat, false, false);
     for (let z = -2.3; z <= 2.3; z += 1.55) {
       createBox(house, 'mullion', [0.12, 2.45, 0.08], [4.4, 1.3, z], darkMetal, false);
     }
 
-    // Ceiling & Roof Beams with cove lighting recess
+    // Ceiling & Roof Beams
     createBox(house, 'roof-perimeter-beam', [9.2, 0.18, 0.3], [0, 2.6, -3.3], darkMetal, false);
     createBox(house, 'roof-front-beam', [9.2, 0.18, 0.3], [0, 2.6, 3.3], darkMetal, false);
     createBox(house, 'roof-cross-beam', [0.25, 0.18, 6.8], [1.3, 2.6, 0], darkMetal, false);
 
-    // Architectural linear cove light strip running along the rear ceiling edge
-    const coveStrip = createBox(house, 'cove-led-strip', [8.6, 0.04, 0.06], [0, 2.5, -3.18], ledStripMat, false, false);
+    // Cove LED strip running along ceiling
+    createBox(house, 'cove-led-strip', [8.6, 0.04, 0.06], [0, 2.5, -3.18], ledStripMat, false, false);
 
     // --- Zone 1: Living & Home Cinema Area ---
-    // Custom woven area rug
     createBox(house, 'living-rug', [3.6, 0.03, 2.6], [0.8, 0.12, 1.1], mat('#c8c2b3', 0.92));
-
-    // Luxury L-shaped sectional sofa
-    const sofaMain = createBox(house, 'sofa-base', [2.8, 0.44, 0.95], [0.7, 0.33, 1.95], fabricMat);
+    createBox(house, 'sofa-base', [2.8, 0.44, 0.95], [0.7, 0.33, 1.95], fabricMat);
     createBox(house, 'sofa-back', [2.8, 0.45, 0.22], [0.7, 0.72, 2.35], fabricMat);
-    // Chaise section
     createBox(house, 'sofa-chaise', [0.95, 0.44, 1.3], [-0.22, 0.33, 0.85], fabricMat);
     createBox(house, 'sofa-chaise-back', [0.22, 0.45, 1.3], [-0.59, 0.72, 0.85], fabricMat);
 
-    // Throw pillows & cushions
+    // Pillows
     createBox(house, 'cushion-1', [0.45, 0.32, 0.14], [0.35, 0.65, 2.15], cushionMat);
     createBox(house, 'cushion-2', [0.45, 0.32, 0.14], [1.2, 0.65, 2.15], ochreMat);
     createBox(house, 'cushion-3', [0.45, 0.32, 0.14], [-0.48, 0.65, 1.25], cushionMat);
 
-    // Low-slung marble coffee table
+    // Honed marble coffee table
     createBox(house, 'coffee-table-top', [1.5, 0.08, 0.8], [0.9, 0.42, 0.75], marbleMat);
     createBox(house, 'table-leg-1', [0.08, 0.3, 0.6], [0.35, 0.22, 0.75], darkMetal);
     createBox(house, 'table-leg-2', [0.08, 0.3, 0.6], [1.45, 0.22, 0.75], darkMetal);
-    // Coffee table decor (architectural book stack + ceramic bowl)
     createBox(house, 'art-book', [0.32, 0.04, 0.25], [0.65, 0.48, 0.7], mat('#2b332c', 0.5));
     const vaseMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.05, 0.22, 12), mat('#dedad1', 0.4));
     vaseMesh.position.set(1.25, 0.55, 0.78);
     house.add(vaseMesh);
 
-    // Media Credenza & Wall-Mounted Ultra-Thin OLED TV
+    // Fluted media console & wall-mounted OLED TV
     createBox(house, 'media-console', [2.6, 0.38, 0.42], [0.8, 0.3, -3.05], woodMat);
-    // OLED TV Frame & Screen
     createBox(house, 'tv-frame', [2.3, 1.3, 0.05], [0.8, 1.72, -3.22], darkMetal);
-    const tvScreen = createBox(house, 'tv-screen', [2.22, 1.22, 0.02], [0.8, 1.72, -3.19], tvScreenMat, false, false);
+    createBox(house, 'tv-screen', [2.22, 1.22, 0.02], [0.8, 1.72, -3.19], tvScreenMat, false, false);
 
-    // Smart Wall Switch Panel next to entrance
-    const switchPanel = createBox(house, 'smart-switch', [0.12, 0.22, 0.03], [3.9, 1.2, 2.4], darkMetal);
-    const switchLed = createBox(house, 'switch-led', [0.03, 0.03, 0.01], [3.9, 1.26, 2.42], ledDotMat, false, false);
+    // Smart Wall Switch Panel
+    createBox(house, 'smart-switch', [0.12, 0.22, 0.03], [3.9, 1.2, 2.4], darkMetal);
+    createBox(house, 'switch-led', [0.03, 0.03, 0.01], [3.9, 1.26, 2.42], mat('#c8ea53', 0.2), false, false);
 
     // --- Zone 2: Kitchen Island & Dining Bar ---
-    // Waterfall Marble Kitchen Island
     createBox(house, 'island-body', [2.1, 0.88, 0.9], [2.2, 0.52, -1.6], woodMat);
-    createBox(house, 'island-marble-top', [2.2, 0.08, 1.0], [2.2, 1.0, -1.6], marbleMat);
-    createBox(house, 'island-waterfall-left', [0.08, 0.94, 1.0], [1.14, 0.5, -1.6], marbleMat);
-    createBox(house, 'island-waterfall-right', [0.08, 0.94, 1.0], [3.26, 0.5, -1.6], marbleMat);
-    // Island toe-kick LED glow strip
-    createBox(house, 'island-led-strip', [1.9, 0.03, 0.03], [2.2, 0.12, -1.12], ledStripMat, false, false);
+    createBox(house, 'island-marble-top', [2.22, 0.08, 1.02], [2.2, 0.98, -1.6], marbleMat);
+    createBox(house, 'island-waterfall-l', [0.08, 0.94, 1.02], [1.13, 0.51, -1.6], marbleMat);
+    createBox(house, 'island-waterfall-r', [0.08, 0.94, 1.02], [3.27, 0.51, -1.6], marbleMat);
 
-    // Modern High Stools (3 stools)
-    for (const x of [1.6, 2.2, 2.8]) {
-      createBox(house, 'stool-seat', [0.4, 0.06, 0.38], [x, 0.65, -0.85], mat('#ba8a5d', 0.4));
-      createBox(house, 'stool-legs', [0.34, 0.58, 0.32], [x, 0.32, -0.85], darkMetal);
-    }
-
-    // Architectural Cone Pendant Lights suspended above island
-    for (const x of [1.7, 2.7]) {
-      const cable = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.85, 8), darkMetal);
-      cable.position.set(x, 2.15, -1.6);
-      house.add(cable);
-
-      const cone = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.22, 16), mat('#c5a059', 0.35, 0.7));
-      cone.position.set(x, 1.65, -1.6);
+    // Suspended conical brass pendants
+    const pendantMat = mat('#d4af37', 0.3, 0.8);
+    for (const px of [1.6, 2.2, 2.8]) {
+      const rod = createBox(house, 'pendant-rod', [0.02, 0.6, 0.02], [px, 2.3, -1.6], darkMetal, false);
+      const cone = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.2, 16), pendantMat);
+      cone.position.set(px, 1.95, -1.6);
+      cone.rotation.x = Math.PI;
       house.add(cone);
-
-      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), ledStripMat);
-      bulb.position.set(x, 1.55, -1.6);
-      house.add(bulb);
     }
 
-    // --- Zone 3: Bedroom Suite ---
-    // Platform Bed
-    createBox(house, 'bed-platform', [2.4, 0.25, 2.3], [-3.1, 0.2, 1.6], woodMat);
-    createBox(house, 'bed-headboard', [2.4, 1.1, 0.18], [-3.1, 0.72, 2.7], fabricMat);
-    createBox(house, 'bed-mattress', [2.15, 0.35, 2.05], [-3.1, 0.45, 1.5], beddingMat);
-    // Duvet fold
-    createBox(house, 'bed-duvet', [2.18, 0.14, 1.4], [-3.1, 0.56, 1.18], fabricMat);
-    // Pillows
-    createBox(house, 'pillow-1', [0.72, 0.15, 0.44], [-3.7, 0.68, 2.25], beddingMat);
-    createBox(house, 'pillow-2', [0.72, 0.15, 0.44], [-2.5, 0.68, 2.25], beddingMat);
-
-    // Floating Nightstands & Bedside Lamps
-    createBox(house, 'nightstand-left', [0.55, 0.25, 0.45], [-4.2, 0.35, 2.5], woodMat);
-    createBox(house, 'nightstand-right', [0.55, 0.25, 0.45], [-2.0, 0.35, 2.5], woodMat);
-    // Bedside Lamp Sconces
-    for (const x of [-4.2, -2.0]) {
-      const lampBase = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.04, 12), darkMetal);
-      lampBase.position.set(x, 0.49, 2.5);
-      house.add(lampBase);
-      const lampShade = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 0.24, 16), fabricMat);
-      lampShade.position.set(x, 0.65, 2.5);
-      house.add(lampShade);
+    // Bar stools
+    for (const sx of [1.6, 2.3, 2.9]) {
+      createBox(house, 'stool-seat', [0.38, 0.06, 0.38], [sx, 0.65, -0.9], mat('#2b332c', 0.7));
+      createBox(house, 'stool-legs', [0.3, 0.6, 0.3], [sx, 0.32, -0.9], darkMetal);
     }
 
-    // Smart Thermostat Panel on Bedroom partition
-    const thermostat = createBox(house, 'smart-thermostat', [0.04, 0.2, 0.2], [-1.48, 1.5, 1.1], darkMetal);
-    const thermostatDisplay = createBox(house, 'thermostat-screen', [0.01, 0.14, 0.14], [-1.46, 1.5, 1.1], ledStripMat, false, false);
+    // --- Zone 3: Master Bedroom Suite ---
+    createBox(house, 'bed-headboard', [2.4, 1.15, 0.16], [-3.1, 0.7, -3.2], mat('#374239', 0.9));
+    createBox(house, 'bed-platform', [2.1, 0.32, 2.3], [-3.1, 0.22, -2.0], woodMat);
+    createBox(house, 'mattress', [1.9, 0.3, 2.1], [-3.1, 0.48, -2.05], mat('#faf9f6', 0.95));
+    createBox(house, 'duvet', [1.94, 0.18, 1.5], [-3.1, 0.58, -1.75], mat('#e2dfd7', 0.9));
+    createBox(house, 'pillow-1', [0.65, 0.14, 0.4], [-3.6, 0.68, -2.8], mat('#ffffff', 0.9));
+    createBox(house, 'pillow-2', [0.65, 0.14, 0.4], [-2.6, 0.68, -2.8], mat('#ffffff', 0.9));
+    createBox(house, 'nightstand-l', [0.55, 0.36, 0.4], [-4.25, 0.26, -2.9], woodMat);
+    createBox(house, 'nightstand-r', [0.55, 0.36, 0.4], [-1.95, 0.26, -2.9], woodMat);
+    createBox(house, 'sconce-l', [0.1, 0.2, 0.1], [-4.25, 1.3, -3.2], darkMetal, false);
+    createBox(house, 'sconce-r', [0.1, 0.2, 0.1], [-1.95, 1.3, -3.2], darkMetal, false);
 
-    // Indoor Architectural Planter & Ficus Tree
-    const planter = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.22, 0.55, 16), mat('#525e51', 0.6));
-    planter.position.set(3.8, 0.35, -2.5);
-    house.add(planter);
-    const foliage = new THREE.Mesh(new THREE.DodecahedronGeometry(0.55, 1), mat('#42593b', 0.85));
-    foliage.position.set(3.8, 0.95, -2.5);
-    foliage.scale.set(0.9, 1.35, 0.9);
-    house.add(foliage);
+    // Wall-mounted smart thermostat
+    createBox(house, 'thermostat', [0.14, 0.14, 0.04], [-1.75, 1.4, 0.5], darkMetal);
+    createBox(house, 'thermostat-screen', [0.1, 0.1, 0.01], [-1.73, 1.4, 0.5], mat('#0ea5e9', 0.2), false, false);
 
-    // --- Motorized Smart Curtains ---
-    // Curtain Track
-    createBox(house, 'curtain-track', [0.08, 0.05, 4.8], [4.28, 2.45, 0], darkMetal, false);
-
-    // Motorized drapes along the glass facade: left panel and right panel
-    const drapeMat = mat('#7d8b73', 0.8, 0.0);
+    // --- Motorized Smart Drapes (Panels Left & Right) ---
+    const drapeMat = mat('#8a9885', 0.85, 0.0);
     const curtainL = createBox(house, 'curtain-left', [0.18, 2.35, 1.8], [4.26, 1.28, -1.3], drapeMat);
     const curtainR = createBox(house, 'curtain-right', [0.18, 2.35, 1.8], [4.26, 1.28, 1.3], drapeMat);
 
-    // Smart Security Laser / Beacons (Visible in Away mode)
-    const securityBeacon = new THREE.Mesh(
-      new THREE.RingGeometry(0.12, 0.24, 24),
-      new THREE.MeshBasicMaterial({ color: '#10b981', side: THREE.DoubleSide, transparent: true, opacity: 0 })
-    );
-    securityBeacon.rotation.x = Math.PI / 2;
-    securityBeacon.position.set(4.2, 0.12, 0);
-    house.add(securityBeacon);
+    // --- Security Perimeter Visualization (Away Mode) ---
+    const securityGroup = new THREE.Group();
+    securityGroup.visible = false;
+    house.add(securityGroup);
 
-    // Ambient floating dust / warm air motes
+    // Doorway radar ring
+    const securityRing1 = new THREE.Mesh(
+      new THREE.RingGeometry(0.2, 0.32, 32),
+      new THREE.MeshBasicMaterial({ color: '#10b981', side: THREE.DoubleSide, transparent: true, opacity: 0.85 })
+    );
+    securityRing1.rotation.x = Math.PI / 2;
+    securityRing1.position.set(4.25, 0.12, 0);
+    securityGroup.add(securityRing1);
+
+    const securityRing2 = new THREE.Mesh(
+      new THREE.RingGeometry(0.45, 0.55, 32),
+      new THREE.MeshBasicMaterial({ color: '#06b6d4', side: THREE.DoubleSide, transparent: true, opacity: 0.6 })
+    );
+    securityRing2.rotation.x = Math.PI / 2;
+    securityRing2.position.set(4.25, 0.12, 0);
+    securityGroup.add(securityRing2);
+
+    // Patio beam line
+    const securityBeam = new THREE.Mesh(
+      new THREE.BoxGeometry(0.04, 2.3, 0.04),
+      new THREE.MeshBasicMaterial({ color: '#10b981', transparent: true, opacity: 0.75 })
+    );
+    securityBeam.position.set(4.25, 1.25, 0);
+    securityGroup.add(securityBeam);
+
+    // Ambient floating dust particles
     const motesGroup = new THREE.Group();
     scene.add(motesGroup);
     const moteMat = new THREE.MeshBasicMaterial({ color: '#fef3c7', transparent: true, opacity: 0.55 });
     for (let i = 0; i < 40; i++) {
-      const mote = new THREE.Mesh(new THREE.SphereGeometry(0.016 + (i % 3) * 0.007, 8, 8), moteMat);
+      const mote = new THREE.Mesh(new THREE.SphereGeometry(0.025, 6, 6), moteMat);
       mote.position.set(
         (Math.random() - 0.5) * 8.5,
-        0.4 + Math.random() * 2.8,
-        (Math.random() - 0.5) * 6.5
+        Math.random() * 2.4 + 0.3,
+        (Math.random() - 0.5) * 6.2
       );
-      mote.userData = {
-        phase: Math.random() * Math.PI * 2,
-        speed: 0.15 + Math.random() * 0.25,
-        radius: 0.003 + Math.random() * 0.006
-      };
+      mote.userData = { speed: Math.random() * 0.4 + 0.2, phase: Math.random() * Math.PI * 2 };
       motesGroup.add(mote);
     }
 
-    // --- State & Scene Configurations ---
+    // --- State & Scene Presets ---
     const state = {
       scene: 'morning',
-      targetCameraX: 9.5,
-      targetCameraY: 7.8,
+      targetCameraX: 9.2,
+      targetCameraY: 7.5,
       targetCameraZ: 11.2,
       targetLookX: 0,
-      targetLookY: 1.2,
+      targetLookY: 1.1,
       targetLookZ: 0,
-      curtainProgress: 0,       // 0 = open, 1 = closed
+      curtainProgress: 0,
       targetCurtainProgress: 0,
       tvActive: false,
       securityActive: false
@@ -336,87 +297,91 @@ function initHomeScene() {
 
     const presets = {
       morning: {
-        bg: '#d6ded0',
-        ambient: 2.1,
-        sun: 3.6,
-        sunColor: '#fff5e0',
-        sunPos: [-6, 10, 7],
+        bg: '#cdd7c6',
+        ambient: 2.2,
+        sun: 3.8,
+        sunColor: '#fff7ed',
+        sunPos: [-6, 11, 7],
         exposure: 1.18,
-        coveIntensity: 0.2,
-        coveColor: '#fffbeb',
-        islandIntensity: 0.3,
+        coveIntensity: 0.3,
+        coveColor: '#ffffff',
+        islandIntensity: 0.4,
+        islandColor: '#fff7ed',
         tvIntensity: 0,
-        tvColor: '#0a101d',
-        curtainTarget: 0.05, // Wide open
+        tvColor: '#0a0d0b',
+        curtainTarget: 0.0, // Fully open
         security: false,
-        cameraPos: [9.5, 7.8, 11.2],
-        lookAt: [0, 1.2, 0],
-        status: 'Morning Harmony',
-        statusDetail: 'Curtains open • Daylight active',
+        cameraPos: [9.2, 7.5, 11.2],
+        lookAt: [0, 1.1, 0],
+        status: 'Morning Awakening',
+        statusDetail: 'Curtains open • 100% natural sunlight',
         temp: '22° Comfort',
         captionL: '01 / MORNING AWAKENING',
         captionR: 'DAYLIGHT SYNCHRONIZATION'
       },
-      movie: {
-        bg: '#1c2420',
-        ambient: 0.5,
-        sun: 0.25,
-        sunColor: '#818cf8',
+      cinema: {
+        bg: '#111713',
+        ambient: 0.45,
+        sun: 0.04,
+        sunColor: '#38bdf8',
         sunPos: [-4, 6, 4],
-        exposure: 0.92,
-        coveIntensity: 1.4,
-        coveColor: '#d97706', // Warm amber cove backlighting
-        islandIntensity: 0.2,
-        tvIntensity: 3.2,
-        tvColor: '#38bdf8', // Vibrant cinematic ambilight
-        curtainTarget: 1.0,  // Fully closed
+        exposure: 0.95,
+        coveIntensity: 2.2,
+        coveColor: '#f59e0b', // Deep warm amber cove glow
+        islandIntensity: 0.15,
+        islandColor: '#38bdf8',
+        tvIntensity: 4.8,     // Brilliant animated ambilight
+        tvColor: '#38bdf8',
+        curtainTarget: 1.0,   // Full blackout
         security: false,
-        cameraPos: [7.8, 5.2, 8.8], // Intimate zoom on living room lounge
-        lookAt: [0.8, 1.4, 0],
-        status: 'Cinema Mode',
-        statusDetail: 'Lights dimmed • Ambilight active',
+        cameraPos: [6.4, 4.2, 7.6], // Dramatic close zoom on entertainment lounge
+        lookAt: [0.4, 1.3, -0.4],
+        status: 'Cinema Sanctuary',
+        statusDetail: 'Blackout drapes closed • 4K Ambilight active',
         temp: '21° Cinema Chill',
         captionL: '02 / CINEMA SANCTUARY',
         captionR: 'AMBIENT ENTERTAINMENT MODE'
       },
       away: {
-        bg: '#8f9889',
-        ambient: 1.1,
-        sun: 1.6,
+        bg: '#7b8577',
+        ambient: 0.85,
+        sun: 1.5,
         sunColor: '#e2e8f0',
-        sunPos: [-2, 11, 5],
+        sunPos: [-2, 12, 5],
         exposure: 1.0,
         coveIntensity: 0,
         coveColor: '#94a3b8',
         islandIntensity: 0,
+        islandColor: '#ffffff',
         tvIntensity: 0,
         tvColor: '#000000',
-        curtainTarget: 0.55, // Privacy shade
-        security: true,
-        cameraPos: [11.0, 9.2, 12.5], // High angle security overview
-        lookAt: [0.5, 1.0, 0],
-        status: 'Secured & Eco',
+        curtainTarget: 0.55,  // Privacy shade
+        security: true,       // Perimeter shields active
+        cameraPos: [13.0, 12.0, 14.0], // High-altitude security perspective
+        lookAt: [0, 0.8, 0],
+        status: 'Away & Protected',
         statusDetail: 'Perimeter armed • Energy save active',
         temp: '26° Eco Standby',
         captionL: '03 / AWAY & PROTECTED',
-        captionR: '24/7 PERIMETER SURVEILLANCE'
+        captionR: '24/7 PERIMETER VIGILANCE'
       },
       evening: {
-        bg: '#475043',
-        ambient: 1.15,
-        sun: 0.6,
-        sunColor: '#f59e0b',
-        sunPos: [-7, 4, 3],
-        exposure: 1.02,
-        coveIntensity: 1.6,
-        coveColor: '#fde68a', // 2700K golden candlelight
-        islandIntensity: 1.8,
+        bg: '#373f35',
+        ambient: 1.25,
+        sun: 0.8,
+        sunColor: '#ea580c',  // Warm sunset orange
+        sunPos: [-7, 3.8, 2.5],
+        exposure: 1.05,
+        coveIntensity: 2.6,
+        coveColor: '#fbbf24', // 2700K golden candlelight
+        islandIntensity: 2.4,
+        islandColor: '#fef3c7',
         tvIntensity: 0.6,
-        tvColor: '#e0e7ff',
-        curtainTarget: 0.85, // Cosy closed
+        tvColor: '#fef3c7',
+        curtainTarget: 0.85,  // Cosy closed
         security: false,
-        cameraPos: [8.8, 6.8, 10.4],
-        lookAt: [0.2, 1.2, 0],
+        cameraPos: [8.4, 6.2, 10.2],
+        lookAt: [0.2, 1.1, 0.1],
         status: 'Evening Unwind',
         statusDetail: 'Warm 2700K scenes • Curtains closed',
         temp: '23° Cosy Evening',
@@ -424,13 +389,18 @@ function initHomeScene() {
         captionR: 'BESPOKE ARCHITECTURAL SCENES'
       }
     };
+    // Support movie as alias for cinema
+    presets.movie = presets.cinema;
 
-    function applyScene(mode) {
+    function applyScene(requestedMode) {
+      let mode = (requestedMode || 'morning').toLowerCase();
+      if (mode === 'movie') mode = 'cinema';
       const p = presets[mode] || presets.morning;
+
       state.scene = mode;
       state.targetCurtainProgress = p.curtainTarget;
       state.securityActive = p.security;
-      state.tvActive = (mode === 'movie');
+      state.tvActive = (mode === 'cinema');
 
       // Camera target interpolation
       state.targetCameraX = p.cameraPos[0];
@@ -452,29 +422,37 @@ function initHomeScene() {
       coveLight.intensity = p.coveIntensity;
       coveLight.color.set(p.coveColor);
       ledStripMat.emissive.set(p.coveColor);
-      ledStripMat.emissiveIntensity = p.coveIntensity > 0 ? 1.0 : 0.05;
+      ledStripMat.emissiveIntensity = p.coveIntensity > 0 ? 1.5 : 0.05;
 
       islandLight.intensity = p.islandIntensity;
+      islandLight.color.set(p.islandColor || '#ffffff');
 
       tvLight.intensity = p.tvIntensity;
       tvLight.color.set(p.tvColor);
       tvScreenMat.emissive.set(p.tvColor);
-      tvScreenMat.emissiveIntensity = p.tvIntensity > 0 ? 1.8 : 0.1;
+      tvScreenMat.emissiveIntensity = p.tvIntensity > 0 ? 2.5 : 0.05;
 
-      securityLight.intensity = p.security ? 1.8 : 0;
-      securityBeacon.material.opacity = p.security ? 0.75 : 0;
+      securityLight.intensity = p.security ? 2.5 : 0;
+      securityGroup.visible = p.security;
 
-      // Update UI cards & pills
-      if (statusPill) statusPill.innerHTML = `${p.status}<br><small style="font-weight:400;color:#6b7280;letter-spacing:0">${p.statusDetail}</small>`;
-      if (tempPill) tempPill.innerHTML = `${p.temp}`;
+      // Update UI HUD Cards & Pills
+      if (statusPill) {
+        statusPill.innerHTML = `${p.status}<br><small style="font-weight:400;color:#6b7280;letter-spacing:0">${p.statusDetail}</small>`;
+      }
+      if (tempPill) {
+        tempPill.innerHTML = `${p.temp}`;
+      }
       if (captionLeft) captionLeft.textContent = p.captionL;
       if (captionRight) captionRight.textContent = p.captionR;
 
-      // Sync all scene buttons
-      sceneButtons.forEach(btn => {
-        const active = (btn.dataset.scene === mode);
-        btn.classList.toggle('active', active);
-        btn.setAttribute('aria-pressed', String(active));
+      // Sync all buttons/chips across the page
+      document.querySelectorAll('[data-scene], .preset-pill, .scene-option, [data-scene-trigger]').forEach(btn => {
+        const btnScene = (btn.dataset.scene || btn.getAttribute('data-scene-trigger') || '').toLowerCase();
+        const isMatch = (btnScene === mode || 
+                         (mode === 'cinema' && (btnScene === 'movie' || btnScene === 'cinema')) ||
+                         (mode === 'movie' && (btnScene === 'cinema' || btnScene === 'movie')));
+        btn.classList.toggle('active', isMatch);
+        btn.setAttribute('aria-pressed', String(isMatch));
       });
 
       // Dispatch dataLayer event for analytics
@@ -488,13 +466,6 @@ function initHomeScene() {
     }
 
     sceneController = { applyScene };
-
-    sceneButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const mode = btn.dataset.scene;
-        if (mode) applyScene(mode);
-      });
-    });
 
     // Start with morning scene
     applyScene('morning');
@@ -512,7 +483,7 @@ function initHomeScene() {
     resizeObserver.observe(canvas.parentElement);
     resize();
 
-    // Mouse & Pointer Parallax with smooth touch support
+    // Mouse & Pointer Parallax + Drag Orbit
     let pointerX = 0;
     let pointerY = 0;
     let isDragging = false;
@@ -551,13 +522,23 @@ function initHomeScene() {
       }
     });
 
-    // Render loop with dampening and dynamic TV color shifts in Movie mode
+    // --- Mouse Wheel Zoom Interaction ---
+    let zoomLevel = 1.0;
+    let targetZoom = 1.0;
+
+    frameEl.addEventListener('wheel', e => {
+      e.preventDefault();
+      const delta = e.deltaY * 0.0016;
+      targetZoom = THREE.MathUtils.clamp(targetZoom + delta, 0.55, 1.75);
+    }, { passive: false });
+
+    // Render loop
     const clock = new THREE.Clock();
     let currentCamX = camera.position.x;
     let currentCamY = camera.position.y;
     let currentCamZ = camera.position.z;
     let currentLookX = 0;
-    let currentLookY = 1.2;
+    let currentLookY = 1.1;
     let currentLookZ = 0;
 
     let isVisible = true;
@@ -573,54 +554,57 @@ function initHomeScene() {
       if (!isVisible) return;
 
       const t = clock.getElapsedTime();
-      const dt = clock.getDelta();
 
       // Gentle breathing idle rotation if not manually dragging
       if (!isDragging) {
-        house.rotation.y = THREE.MathUtils.damp(house.rotation.y, -0.15 + pointerX * 0.25 + Math.sin(t * 0.25) * 0.03, 1.8, 1 / 60);
+        house.rotation.y = THREE.MathUtils.damp(house.rotation.y, -0.15 + pointerX * 0.25 + Math.sin(t * 0.25) * 0.025, 1.8, 1 / 60);
         house.rotation.x = THREE.MathUtils.damp(house.rotation.x, pointerY * -0.06, 2.0, 1 / 60);
       }
-      house.position.y = Math.sin(t * 0.8) * 0.03;
+      house.position.y = Math.sin(t * 0.8) * 0.025;
 
-      // Smooth curtain glide animation (curtain L & R)
-      state.curtainProgress = THREE.MathUtils.damp(state.curtainProgress, state.targetCurtainProgress, 2.4, 1 / 60);
-      // Open: curtain folded compactly at z = -2.1 and +2.1; Closed: drawn to z = -0.8 and +0.8
+      // Smooth curtain glide animation
+      state.curtainProgress = THREE.MathUtils.damp(state.curtainProgress, state.targetCurtainProgress, 2.5, 1 / 60);
       curtainL.position.z = THREE.MathUtils.lerp(-2.15, -0.9, state.curtainProgress);
       curtainR.position.z = THREE.MathUtils.lerp(2.15, 0.9, state.curtainProgress);
-      // S-fold width scales with closing
       curtainL.scale.z = THREE.MathUtils.lerp(0.55, 1.15, state.curtainProgress);
       curtainR.scale.z = THREE.MathUtils.lerp(0.55, 1.15, state.curtainProgress);
 
-      // Camera position interpolation with parallax
-      const desiredCamX = state.targetCameraX + pointerX * 0.8;
-      const desiredCamY = state.targetCameraY + pointerY * -0.4;
-      const desiredCamZ = state.targetCameraZ + pointerX * 0.4;
+      // Interpolate smooth zoom
+      zoomLevel = THREE.MathUtils.damp(zoomLevel, targetZoom, 3.2, 1 / 60);
 
-      currentCamX = THREE.MathUtils.damp(currentCamX, desiredCamX, 1.6, 1 / 60);
-      currentCamY = THREE.MathUtils.damp(currentCamY, desiredCamY, 1.6, 1 / 60);
-      currentCamZ = THREE.MathUtils.damp(currentCamZ, desiredCamZ, 1.6, 1 / 60);
+      // Camera position interpolation with parallax and wheel zoom
+      const desiredCamX = (state.targetCameraX + pointerX * 0.8) * zoomLevel;
+      const desiredCamY = (state.targetCameraY + pointerY * -0.4) * zoomLevel;
+      const desiredCamZ = (state.targetCameraZ + pointerX * 0.4) * zoomLevel;
+
+      currentCamX = THREE.MathUtils.damp(currentCamX, desiredCamX, 1.8, 1 / 60);
+      currentCamY = THREE.MathUtils.damp(currentCamY, desiredCamY, 1.8, 1 / 60);
+      currentCamZ = THREE.MathUtils.damp(currentCamZ, desiredCamZ, 1.8, 1 / 60);
       camera.position.set(currentCamX, currentCamY, currentCamZ);
 
-      currentLookX = THREE.MathUtils.damp(currentLookX, state.targetLookX + pointerX * 0.2, 1.8, 1 / 60);
-      currentLookY = THREE.MathUtils.damp(currentLookY, state.targetLookY, 1.8, 1 / 60);
-      currentLookZ = THREE.MathUtils.damp(currentLookZ, state.targetLookZ, 1.8, 1 / 60);
+      currentLookX = THREE.MathUtils.damp(currentLookX, state.targetLookX + pointerX * 0.2, 2.0, 1 / 60);
+      currentLookY = THREE.MathUtils.damp(currentLookY, state.targetLookY, 2.0, 1 / 60);
+      currentLookZ = THREE.MathUtils.damp(currentLookZ, state.targetLookZ, 2.0, 1 / 60);
       camera.lookAt(currentLookX, currentLookY, currentLookZ);
 
-      // Dynamic movie TV flickering / color shifts for ultra realism
+      // Dynamic movie TV flickering & color shifts
       if (state.tvActive) {
-        const tvHue = (Math.sin(t * 1.5) * 0.15 + 0.58) % 1; // shifting cyan/indigo/warm cinematic hues
-        tvLight.color.setHSL(tvHue, 0.85, 0.6);
-        tvScreenMat.emissive.setHSL(tvHue, 0.9, 0.55 + Math.sin(t * 4.2) * 0.08);
+        const tvHue = (Math.sin(t * 1.6) * 0.16 + 0.58) % 1;
+        tvLight.color.setHSL(tvHue, 0.88, 0.6);
+        tvScreenMat.emissive.setHSL(tvHue, 0.92, 0.6 + Math.sin(t * 4.5) * 0.1);
       }
 
-      // Security pulse animation
+      // Security pulse animation (Away Mode)
       if (state.securityActive) {
-        const secPulse = Math.sin(t * 3.5) * 0.5 + 0.5;
-        securityBeacon.scale.set(1 + secPulse * 0.35, 1 + secPulse * 0.35, 1);
-        securityBeacon.material.opacity = 0.45 + secPulse * 0.4;
+        const secPulse = Math.sin(t * 3.8) * 0.5 + 0.5;
+        securityRing1.scale.set(1 + secPulse * 0.4, 1 + secPulse * 0.4, 1);
+        securityRing2.scale.set(1 + (1 - secPulse) * 0.35, 1 + (1 - secPulse) * 0.35, 1);
+        securityRing1.material.opacity = 0.5 + secPulse * 0.45;
+        securityRing2.material.opacity = 0.3 + (1 - secPulse) * 0.45;
+        securityBeam.material.opacity = 0.4 + secPulse * 0.4;
       }
 
-      // Dust motes gentle drift
+      // Dust motes drift
       motesGroup.children.forEach(m => {
         m.position.y = 0.4 + ((m.position.y - 0.4 + Math.sin(t * m.userData.speed + m.userData.phase) * 0.0015 + 2.8) % 2.8);
         m.position.x += Math.sin(t * 0.3 + m.userData.phase) * 0.001;
@@ -636,6 +620,17 @@ function initHomeScene() {
     if (fallback) fallback.style.opacity = '1';
   }
 }
+
+// Global Delegated Click Listener for Scene Chips & Options
+document.addEventListener('click', e => {
+  const trigger = e.target.closest('[data-scene], .preset-pill, .scene-option, [data-scene-trigger]');
+  if (trigger) {
+    const sceneName = trigger.dataset.scene || trigger.getAttribute('data-scene-trigger');
+    if (sceneName && sceneController) {
+      sceneController.applyScene(sceneName);
+    }
+  }
+});
 
 // Initialize on DOM ready
 if (document.readyState === 'loading') {
@@ -678,23 +673,41 @@ document.querySelectorAll('.section-heading, .solution-card, .day-card, .product
     revealObserver.observe(el);
   });
 
-// --- Lead Capture & Google Ads Conversion Tracking ---
-const leadForm = document.querySelector('#vmk-lead-form');
-const feedback = document.querySelector('#form-feedback');
-const submit = leadForm?.querySelector('button[type="submit"]');
+// --- 3D Card Hover Interaction & Tilt ---
+document.querySelectorAll('.solution-card, .scenario-card, .step-card').forEach(card => {
+  card.addEventListener('pointermove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotX = ((y - centerY) / centerY) * -4.5;
+    const rotY = ((x - centerX) / centerX) * 4.5;
+    card.style.transform = `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) translateY(-8px) scale(1.015)`;
+  });
 
-// Extract URL query params for Google Ads attribution
+  card.addEventListener('pointerleave', () => {
+    card.style.transform = '';
+  });
+});
+
+// --- Lead Form & Attribution Preservation ---
+const leadForm = document.querySelector('#lead-form');
+const feedback = document.querySelector('#form-feedback');
+const submit = document.querySelector('#form-submit');
+
+// Parse and preserve Google Ads click IDs and UTM campaign parameters
 const searchParams = new URLSearchParams(window.location.search);
 const attributionFields = ['gclid', 'gbraid', 'wbraid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
 
-attributionFields.forEach(param => {
-  const val = searchParams.get(param);
+attributionFields.forEach(field => {
+  const val = searchParams.get(field);
   if (val && leadForm) {
-    let input = leadForm.querySelector(`input[name="${param}"]`);
+    let input = leadForm.querySelector(`input[name="${field}"]`);
     if (!input) {
       input = document.createElement('input');
       input.type = 'hidden';
-      input.name = param;
+      input.name = field;
       leadForm.appendChild(input);
     }
     input.value = val;
@@ -716,26 +729,23 @@ leadForm?.addEventListener('submit', async event => {
     feedback.className = 'form-feedback';
   }
 
-  // Push submission attempt to dataLayer
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({
     event: 'vmk_lead_form_submit_attempt'
   });
 
   const formData = new FormData(leadForm);
-  let formAction = leadForm.getAttribute('action') || 'process-lead.php';
+  let formAction = leadForm.getAttribute('action') || 'api/process-lead';
 
   try {
     let response;
     try {
-      // First attempt submission to the configured action endpoint (e.g. /api/process-lead or process-lead.php)
       response = await fetch(formAction, {
         method: 'POST',
         body: formData,
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
       });
     } catch (fetchErr) {
-      // If /api/process-lead or relative path failed, attempt fallback to process-lead.php
       if (formAction !== 'process-lead.php') {
         response = await fetch('process-lead.php', {
           method: 'POST',
@@ -748,12 +758,9 @@ leadForm?.addEventListener('submit', async event => {
     }
 
     if (!response.ok && response.status === 404) {
-      // Serverless or static fallback: if static Vercel host without backend, provide immediate graceful confirmation
       feedback.textContent = 'Thank you! Your consultation request has been received. Our team will contact you shortly.';
       feedback.classList.add('success');
       leadForm.reset();
-
-      // Trigger GTM / Google Ads conversion event only on success
       window.dataLayer.push({
         event: 'vmk_lead_form_success',
         lead_service: formData.get('interest') || 'Complete home automation'
@@ -766,8 +773,6 @@ leadForm?.addEventListener('submit', async event => {
       feedback.textContent = data.message || 'Thank you! Our home automation experts will contact you shortly.';
       feedback.classList.add('success');
       leadForm.reset();
-
-      // Trigger verified conversion event in dataLayer
       window.dataLayer.push({
         event: 'vmk_lead_form_success',
         lead_service: formData.get('interest') || 'General Home Automation'
@@ -777,7 +782,6 @@ leadForm?.addEventListener('submit', async event => {
       feedback.classList.add('error');
     }
   } catch (error) {
-    // Graceful fallback for demo or static environments
     feedback.textContent = 'Thank you for reaching out! You can also connect directly on WhatsApp at +91 85270 87270 for immediate assistance.';
     feedback.classList.add('success');
   } finally {
