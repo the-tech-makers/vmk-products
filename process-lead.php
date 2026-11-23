@@ -69,6 +69,7 @@ $name     = clean($_POST['name'] ?? '');
 $phone    = clean($_POST['phone'] ?? '');
 $email    = clean($_POST['email'] ?? '');
 $city     = clean($_POST['city'] ?? '');
+$property_type = clean($_POST['property_type'] ?? '');
 $interest = clean($_POST['interest'] ?? '');
 $message  = clean($_POST['message'] ?? '');
 
