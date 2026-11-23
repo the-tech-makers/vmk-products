@@ -231,18 +231,66 @@
           <div class="eyebrow"><span class="eyebrow-line"></span> STEP INSIDE</div>
           <h2>A home that moves<br>with <em>your daily rhythm.</em></h2>
         </div>
-        <p>Choose an automation scenario below to see how intelligent controls transform the lighting, shading, entertainment, and comfort across the residence.</p>
+        <p>Choose an automation scenario below to see how intelligent controls transform the lighting, shading, entertainment, and comfort across the residence in real time.</p>
       </div>
 
       <div class="experience-grid">
-        <div class="experience-image">
-          <img src="assets/images/gallery-living-room.webp" alt="Luxury contemporary living room with smart ambient lighting" loading="lazy">
+        <!-- Interactive Visual Showcase with Live HUD -->
+        <div class="experience-image" id="experience-showcase">
+          <!-- Background Cross-fade Container -->
+          <div class="experience-slides">
+            <img class="experience-slide active" data-scene="morning" src="assets/images/scenario-morning.webp" alt="Morning natural sunlight in luxury smart bedroom" loading="lazy">
+            <img class="experience-slide" data-scene="cinema" src="assets/images/scenario-movie.webp" alt="Cosy luxury living room cinema evening with ambilight" loading="lazy">
+            <img class="experience-slide" data-scene="away" src="assets/images/scenario-leaving.webp" alt="Front entrance of automated modern home with perimeter security" loading="lazy">
+            <img class="experience-slide" data-scene="evening" src="assets/images/scenario-night.webp" alt="Warm 2700K ambient living room lighting at night" loading="lazy">
+          </div>
+
           <div class="image-shade"></div>
-          <div class="image-overline">BESPOKE RESIDENTIAL CONTROL</div>
-          <div class="image-title">Intelligent Spaces.<br>Effortless Atmosphere.</div>
-          <span class="image-index">01 / 04</span>
+          <div class="experience-ambient-glow" id="experience-glow"></div>
+
+          <!-- Top HUD Header -->
+          <div class="showcase-top">
+            <span class="showcase-badge" id="showcase-time">
+              <span class="pulse-dot"></span>
+              <strong id="showcase-time-text">07:00 AM</strong> • <span id="showcase-profile-text">CIRCADIAN DAWN</span>
+            </span>
+            <div class="showcase-actions">
+              <a href="#top" class="showcase-3d-jump" title="Scroll up to inspect 3D architectural model reacting">
+                <span>Inspect in 3D</span>
+                <span class="jump-arrow">↗</span>
+              </a>
+              <span class="image-index" id="showcase-index">01 / 04</span>
+            </div>
+          </div>
+
+          <!-- Title and Narrative -->
+          <div class="showcase-body">
+            <div class="image-overline" id="showcase-overline">NATURAL RESIDENTIAL RHYTHM</div>
+            <div class="image-title" id="showcase-title">Soft sunlight fills the room.<br>Daylight begins effortlessly.</div>
+          </div>
+
+          <!-- Bottom Telemetry HUD Matrix -->
+          <div class="showcase-telemetry">
+            <div class="telemetry-item">
+              <span class="tel-label">CLIMATE</span>
+              <span class="tel-val" id="tel-climate">22.0°C • Fresh Air</span>
+            </div>
+            <div class="telemetry-item">
+              <span class="tel-label">LIGHTING</span>
+              <span class="tel-val" id="tel-lighting">6500K Daylight (85%)</span>
+            </div>
+            <div class="telemetry-item">
+              <span class="tel-label">DRAPERY</span>
+              <span class="tel-val" id="tel-drapery">100% Glide Open</span>
+            </div>
+            <div class="telemetry-item">
+              <span class="tel-label">ACOUSTICS</span>
+              <span class="tel-val" id="tel-acoustics">Morning Birds &amp; Acoustic</span>
+            </div>
+          </div>
         </div>
 
+        <!-- Control Console -->
         <div class="control-panel">
           <div class="panel-top">
             <span>SCENE AUTOMATION</span>
@@ -250,43 +298,43 @@
           </div>
 
           <h3>Set the ambiance.</h3>
-          <p>Tap any preset to command the 3D model above and preview your connected living environment.</p>
+          <p>Tap any preset to transform the room visual, update live environmental telemetry, and command the 3D home model above.</p>
 
           <div class="scene-options">
             <button class="scene-option active" data-scene="morning" aria-pressed="true">
               <span class="scene-emoji">☀</span>
               <span>
                 <strong>Good Morning</strong>
-                <small>Curtains glide open • Warm daylight fills the interior • Fresh 22° climate</small>
+                <small>Curtains glide open • Natural 6500K daylight • Fresh 22° climate</small>
               </span>
-              <b>↗</b>
+              <span class="scene-active-pill">ACTIVE</span>
             </button>
 
             <button class="scene-option" data-scene="cinema" aria-pressed="false">
               <span class="scene-emoji">◐</span>
               <span>
                 <strong>Cinema Night</strong>
-                <small>Curtains draw shut • Accent cove lights glow amber • Ambilight TV activates</small>
+                <small>Curtains draw shut • 4% amber cove glow • Ambilight TV activates</small>
               </span>
-              <b>↗</b>
+              <span class="scene-active-pill">SELECT</span>
             </button>
 
             <button class="scene-option" data-scene="away" aria-pressed="false">
               <span class="scene-emoji">⌂</span>
               <span>
                 <strong>Away &amp; Eco Mode</strong>
-                <small>Interior lighting turns off • Perimeter sensors arm • Climate enters standby</small>
+                <small>Lights power off • Perimeter sensors arm • Climate standby</small>
               </span>
-              <b>↗</b>
+              <span class="scene-active-pill">SELECT</span>
             </button>
 
             <button class="scene-option" data-scene="evening" aria-pressed="false">
               <span class="scene-emoji">☾</span>
               <span>
                 <strong>Evening Unwind</strong>
-                <small>Golden 2700K ambient wash • Curtains close for privacy • Cosy restful mood</small>
+                <small>Golden 2700K ambient wash • Curtains close • Restful warm mood</small>
               </span>
-              <b>↗</b>
+              <span class="scene-active-pill">SELECT</span>
             </button>
           </div>
 
@@ -297,20 +345,29 @@
         </div>
       </div>
 
-      <!-- Feature Pillars -->
+      <!-- Feature Pillars with Dynamic Scenario Alignment -->
       <div class="feature-pillars-grid">
-        <div class="feature-pillar">
-          <span class="pillar-index">01 / NATURAL RHYTHM</span>
+        <div class="feature-pillar pillar-morning active" data-pillar="0">
+          <div class="pillar-header">
+            <span class="pillar-index">01 / NATURAL RHYTHM</span>
+            <span class="pillar-tag">MORNING &amp; EVENING</span>
+          </div>
           <h4>Circadian Daylight Harmony</h4>
-          <p>Lighting automatically shifts in color temperature throughout the day—energizing cool daylight in the afternoon, transitioning to calming golden candlelight by dusk.</p>
+          <p>Lighting automatically shifts in color temperature throughout the day—energizing cool daylight in the morning, transitioning to calming golden candlelight by dusk.</p>
         </div>
-        <div class="feature-pillar">
-          <span class="pillar-index">02 / UNCOMPROMISED COMFORT</span>
+        <div class="feature-pillar pillar-cinema" data-pillar="1">
+          <div class="pillar-header">
+            <span class="pillar-index">02 / UNCOMPROMISED COMFORT</span>
+            <span class="pillar-tag">CINEMA RETREAT</span>
+          </div>
           <h4>Whisper-Quiet Shading &amp; Climate</h4>
-          <p>Motorized drapery tracks and multi-zone smart thermostats coordinate seamlessly to optimize thermal efficiency and preserve indoor privacy without manual effort.</p>
+          <p>Motorized drapery tracks and multi-zone smart thermostats coordinate seamlessly to optimize thermal efficiency, acoustics, and total privacy without manual effort.</p>
         </div>
-        <div class="feature-pillar">
-          <span class="pillar-index">03 / CONTINUOUS VIGILANCE</span>
+        <div class="feature-pillar pillar-away" data-pillar="2">
+          <div class="pillar-header">
+            <span class="pillar-index">03 / CONTINUOUS VIGILANCE</span>
+            <span class="pillar-tag">AWAY GUARD</span>
+          </div>
           <h4>Intelligent Perimeter Security</h4>
           <p>Encrypted smart locks, discrete door sensors, and AI-driven camera alerts ensure your home is fully protected whether you are in bed or halfway around the world.</p>
         </div>

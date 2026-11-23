@@ -455,6 +455,9 @@ function initHomeScene() {
         btn.setAttribute('aria-pressed', String(isMatch));
       });
 
+      // Synchronize Section 2 (A home that moves with your daily rhythm)
+      updateExperienceSection(mode);
+
       // Dispatch dataLayer event for analytics
       if (typeof window !== 'undefined') {
         window.dataLayer = window.dataLayer || [];
@@ -622,15 +625,139 @@ function initHomeScene() {
 }
 
 // Global Delegated Click Listener for Scene Chips & Options
+// --- Dynamic Daily Rhythm Section Showcase ---
+const rhythmScenarios = {
+  morning: {
+    index: '01 / 04',
+    time: '07:00 AM',
+    profile: 'CIRCADIAN DAWN',
+    overline: 'NATURAL RESIDENTIAL RHYTHM',
+    title: 'Soft sunlight fills the room.<br>Daylight begins effortlessly.',
+    climate: '22.0°C • Fresh Air Intake',
+    lighting: '6500K Daylight (85%)',
+    drapery: '100% Glide Open',
+    acoustics: 'Morning Birds & Acoustic',
+    glow: 'radial-gradient(circle at 75% 25%, rgba(255, 230, 180, 0.4) 0%, transparent 60%)',
+    pillarIndex: 0
+  },
+  cinema: {
+    index: '02 / 04',
+    time: '08:30 PM',
+    profile: 'CINEMATIC RETREAT',
+    overline: 'IMMERSIVE ENTERTAINMENT MODE',
+    title: 'Lights dim. Curtains glide shut.<br>4K Ambilight takes over.',
+    climate: '20.5°C • Comfort Chill',
+    lighting: 'Amber Cove 4% • TV Ambilight',
+    drapery: '100% Blackout Drapes',
+    acoustics: 'Dolby Atmos 7.1 Calibrated',
+    glow: 'radial-gradient(circle at 50% 50%, rgba(30, 45, 95, 0.5) 0%, rgba(200, 140, 40, 0.2) 60%, transparent 80%)',
+    pillarIndex: 1
+  },
+  away: {
+    index: '03 / 04',
+    time: '10:00 AM',
+    profile: 'AUTONOMOUS GUARD',
+    overline: 'WHOLE-ESTATE ECO DEFENSE',
+    title: 'All circuits secured.<br>Intelligent perimeter eco guard.',
+    climate: '26.0°C • Eco Standby',
+    lighting: 'All Circuits Off (0%)',
+    drapery: '50% Solar Heat Rejection',
+    acoustics: 'Silent Standby',
+    glow: 'radial-gradient(circle at 50% 30%, rgba(30, 70, 50, 0.45) 0%, transparent 70%)',
+    pillarIndex: 2
+  },
+  evening: {
+    index: '04 / 04',
+    time: '06:30 PM',
+    profile: 'DUSK TRANQUILLITY',
+    overline: 'WARM SANCTUARY WELCOME',
+    title: 'Warm 2700K candlelit glow.<br>Unwind in bespoke comfort.',
+    climate: '23.0°C • Restful Warmth',
+    lighting: '2700K Warm Wash (60%)',
+    drapery: '85% Privacy Sheers',
+    acoustics: 'Gentle Lounge Jazz',
+    glow: 'radial-gradient(circle at 30% 70%, rgba(255, 175, 75, 0.35) 0%, transparent 65%)',
+    pillarIndex: 0
+  }
+};
+rhythmScenarios.movie = rhythmScenarios.cinema;
+
+function updateExperienceSection(modeName) {
+  let mode = (modeName || 'morning').toLowerCase();
+  if (mode === 'movie') mode = 'cinema';
+  const data = rhythmScenarios[mode] || rhythmScenarios.morning;
+
+  // Cross-fade scenario slides
+  const slides = document.querySelectorAll('.experience-slide');
+  slides.forEach(slide => {
+    const slideScene = (slide.dataset.scene || '').toLowerCase();
+    const isMatch = (slideScene === mode || (mode === 'cinema' && slideScene === 'movie'));
+    slide.classList.toggle('active', isMatch);
+  });
+
+  // Ambient glow
+  const glow = document.querySelector('#experience-glow');
+  if (glow) glow.style.background = data.glow;
+
+  // HUD top tags
+  const timeEl = document.querySelector('#showcase-time-text');
+  if (timeEl) timeEl.textContent = data.time;
+  const profileEl = document.querySelector('#showcase-profile-text');
+  if (profileEl) profileEl.textContent = data.profile;
+  const indexEl = document.querySelector('#showcase-index');
+  if (indexEl) indexEl.textContent = data.index;
+
+  // Showcase texts
+  const overlineEl = document.querySelector('#showcase-overline');
+  if (overlineEl) overlineEl.textContent = data.overline;
+  const titleEl = document.querySelector('#showcase-title');
+  if (titleEl) titleEl.innerHTML = data.title;
+
+  // Telemetry HUD Matrix
+  const telClimate = document.querySelector('#tel-climate');
+  if (telClimate) telClimate.textContent = data.climate;
+  const telLighting = document.querySelector('#tel-lighting');
+  if (telLighting) telLighting.textContent = data.lighting;
+  const telDrapery = document.querySelector('#tel-drapery');
+  if (telDrapery) telDrapery.textContent = data.drapery;
+  const telAcoustics = document.querySelector('#tel-acoustics');
+  if (telAcoustics) telAcoustics.textContent = data.acoustics;
+
+  // Update scene option pills
+  document.querySelectorAll('.scene-option').forEach(opt => {
+    const optScene = (opt.dataset.scene || '').toLowerCase();
+    const isMatch = (optScene === mode || (mode === 'cinema' && optScene === 'movie'));
+    opt.classList.toggle('active', isMatch);
+    opt.setAttribute('aria-pressed', String(isMatch));
+    const pill = opt.querySelector('.scene-active-pill');
+    if (pill) {
+      pill.textContent = isMatch ? 'ACTIVE' : 'SELECT';
+    }
+  });
+
+  // Highlight matching feature pillar
+  document.querySelectorAll('.feature-pillar').forEach(pillar => {
+    const pIdx = parseInt(pillar.dataset.pillar, 10);
+    pillar.classList.toggle('active', pIdx === data.pillarIndex);
+  });
+}
+
+// Global click delegation for all scene controls
 document.addEventListener('click', e => {
   const trigger = e.target.closest('[data-scene], .preset-pill, .scene-option, [data-scene-trigger]');
   if (trigger) {
     const sceneName = trigger.dataset.scene || trigger.getAttribute('data-scene-trigger');
-    if (sceneName && sceneController) {
-      sceneController.applyScene(sceneName);
+    if (sceneName) {
+      updateExperienceSection(sceneName);
+      if (sceneController) {
+        sceneController.applyScene(sceneName);
+      }
     }
   }
 });
+
+// Run initial synchronization for Section 2
+updateExperienceSection('morning');
 
 // Initialize on DOM ready
 if (document.readyState === 'loading') {
@@ -757,33 +884,41 @@ leadForm?.addEventListener('submit', async event => {
       }
     }
 
-    if (!response.ok && response.status === 404) {
-      feedback.textContent = 'Thank you! Your consultation request has been received. Our team will contact you shortly.';
-      feedback.classList.add('success');
-      leadForm.reset();
-      window.dataLayer.push({
-        event: 'vmk_lead_form_success',
-        lead_service: formData.get('interest') || 'Complete home automation'
-      });
-      return;
+    if (response && response.ok) {
+      const data = await response.json();
+      if (data.success) {
+        feedback.textContent = data.message || 'Thank you! Our home automation experts will contact you shortly.';
+        feedback.className = 'form-feedback success';
+        leadForm.reset();
+        window.dataLayer.push({
+          event: 'vmk_lead_form_success',
+          lead_service: formData.get('interest') || 'General Home Automation'
+        });
+        return;
+      } else {
+        feedback.textContent = data.message || 'Please check the information entered and try again.';
+        feedback.className = 'form-feedback error';
+        window.dataLayer.push({
+          event: 'vmk_lead_form_error',
+          error_message: data.message || 'Validation error'
+        });
+        return;
+      }
     }
 
-    const data = await response.json();
-    if (data.success) {
-      feedback.textContent = data.message || 'Thank you! Our home automation experts will contact you shortly.';
-      feedback.classList.add('success');
-      leadForm.reset();
-      window.dataLayer.push({
-        event: 'vmk_lead_form_success',
-        lead_service: formData.get('interest') || 'General Home Automation'
-      });
-    } else {
-      feedback.textContent = data.message || 'Please check the information entered and try again.';
-      feedback.classList.add('error');
-    }
+    // Handled failure: do not record false success conversion
+    feedback.textContent = 'Unable to submit directly online. Please reach our team via WhatsApp at +91 85270 87270 or call +91 85270 87270.';
+    feedback.className = 'form-feedback error';
+    window.dataLayer.push({
+      event: 'vmk_lead_form_failure',
+      status: response ? response.status : 0
+    });
   } catch (error) {
-    feedback.textContent = 'Thank you for reaching out! You can also connect directly on WhatsApp at +91 85270 87270 for immediate assistance.';
-    feedback.classList.add('success');
+    feedback.textContent = 'Unable to connect to the booking server. Please call or message us on WhatsApp at +91 85270 87270.';
+    feedback.className = 'form-feedback error';
+    window.dataLayer.push({
+      event: 'vmk_lead_form_network_error'
+    });
   } finally {
     if (submit) {
       submit.disabled = false;
