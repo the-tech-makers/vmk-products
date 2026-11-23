@@ -133,7 +133,8 @@ $plainBody = "New Lead — VMK Products Website\n\n"
     . "City/Location: " . ($city !== '' ? $city : '-') . "\n"
     . "Interested In: " . ($interest !== '' ? $interest : '-') . "\n"
     . "Message: " . ($message !== '' ? $message : '-') . "\n"
-    . "Submitted: {$submittedAt}\n";
+    . "Submitted: {$submittedAt}\n"
+    . "\nAd attribution:\n{$attributionText}";
 
 // ------------------------------------------------------------------
 // 4. Send via SMTP (PHPMailer)
