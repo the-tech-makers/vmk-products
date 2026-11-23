@@ -72,6 +72,21 @@ $city     = clean($_POST['city'] ?? '');
 $interest = clean($_POST['interest'] ?? '');
 $message  = clean($_POST['message'] ?? '');
 
+// Preserve Google Ads click identifiers and campaign tags with the lead.
+$adAttribution = [];
+foreach (['gclid', 'gbraid', 'wbraid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'] as $key) {
+    $value = clean($_POST[$key] ?? '');
+    if ($value !== '') {
+        $adAttribution[$key] = $value;
+    }
+}
+$attributionHtml = '';
+$attributionText = '';
+foreach ($adAttribution as $key => $value) {
+    $attributionHtml .= "<tr><td style='padding:6px 12px;font-weight:bold;'>" . htmlspecialchars($key, ENT_QUOTES, 'UTF-8') . "</td><td style='padding:6px 12px;'>" . $value . "</td></tr>";
+    $attributionText .= strtoupper($key) . ": {$value}\\n";
+}
+
 $errors = [];
 
 if ($name === '') {
@@ -107,6 +122,7 @@ $htmlBody = "
         <tr><td style='padding:6px 12px;font-weight:bold;'>Interested In</td><td style='padding:6px 12px;'>" . ($interest !== '' ? $interest : '—') . "</td></tr>
         <tr><td style='padding:6px 12px;font-weight:bold;vertical-align:top;'>Message</td><td style='padding:6px 12px;'>" . (($message !== '' ? nl2br($message) : '—')) . "</td></tr>
         <tr><td style='padding:6px 12px;font-weight:bold;'>Submitted</td><td style='padding:6px 12px;'>{$submittedAt}</td></tr>
+        {$attributionHtml}
     </table>
 ";
 
