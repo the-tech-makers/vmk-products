@@ -18,14 +18,7 @@
 
   <link rel="stylesheet" href="assets/css/vmk-3d.css">
 
-  <!-- Three.js 3D Engine -->
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js"
-      }
-    }
-  </script>
+  <!-- Smart Home Cinematic Video Stage & Interactive Logic -->
   <script type="module" src="assets/js/smart-home-3d.js"></script>
 
   <!-- Structured Data: LocalBusiness & FAQPage for Google SEO -->
@@ -155,51 +148,83 @@
         </div>
       </div>
 
-      <!-- 3D Hero Viewport -->
+      <!-- Cinematic Video Stage Viewport -->
       <div class="hero-visual" id="hero-visual">
         <div class="scene-header-bar">
           <div class="scene-label">
             <span class="live-dot"></span>
-            INTERACTIVE 3D CUTAWAY
-            <small>REAL-TIME WEBGL</small>
+            CINEMATIC ARCHITECTURAL SHOWROOM
+            <small>INTERACTIVE VIDEO STAGE</small>
           </div>
           <div class="scene-preset-quick-pills">
             <button class="preset-pill active" data-scene="morning" aria-label="Switch to morning scene"><span>☀</span> Morning</button>
-            <button class="preset-pill" data-scene="cinema" aria-label="Switch to movie scene"><span>◐</span> Cinema</button>
+            <button class="preset-pill" data-scene="cinema" aria-label="Switch to cinema scene"><span>◐</span> Cinema</button>
             <button class="preset-pill" data-scene="away" aria-label="Switch to away scene"><span>⌂</span> Away</button>
             <button class="preset-pill" data-scene="evening" aria-label="Switch to evening scene"><span>☾</span> Evening</button>
           </div>
         </div>
 
-        <div class="scene-frame" title="Click and drag to rotate the 3D smart home model">
-          <canvas id="home-scene" aria-label="Interactive 3D model of a luxury architectural smart residence"></canvas>
-          <div class="scene-fallback" aria-hidden="true"></div>
-          
-          <div class="scene-interaction-hint">
-            <span>✦ Drag to rotate house • Scroll wheel to zoom</span>
+        <div class="scene-frame" id="scene-frame" title="Interactive cinematic smart home video stage — switch presets to explore">
+          <div class="cinematic-stage" id="cinematic-stage">
+            <!-- Photorealistic Cinematic Video Layers with Seamless Crossfade -->
+            <div class="cinematic-video-wrap active" data-scene="morning">
+              <video class="cinematic-video" autoplay loop muted playsinline preload="auto" poster="assets/images/scene-morning.webp">
+                <source src="assets/videos/scene-morning.mp4" type="video/mp4">
+                <img src="assets/images/scene-morning.webp" alt="Morning natural sunlight in luxury smart residence">
+              </video>
+            </div>
+            <div class="cinematic-video-wrap" data-scene="cinema">
+              <video class="cinematic-video" autoplay loop muted playsinline preload="auto" poster="assets/images/scene-cinema.webp">
+                <source src="assets/videos/scene-cinema.mp4" type="video/mp4">
+                <img src="assets/images/scene-cinema.webp" alt="Cinema mode entertainment lounge with ambient illumination">
+              </video>
+            </div>
+            <div class="cinematic-video-wrap" data-scene="away">
+              <video class="cinematic-video" autoplay loop muted playsinline preload="auto" poster="assets/images/scene-away.webp">
+                <source src="assets/videos/scene-away.mp4" type="video/mp4">
+                <img src="assets/images/scene-away.webp" alt="Front entryway of automated modern residence with perimeter security">
+              </video>
+            </div>
+            <div class="cinematic-video-wrap" data-scene="evening">
+              <video class="cinematic-video" autoplay loop muted playsinline preload="auto" poster="assets/images/scene-evening.webp">
+                <source src="assets/videos/scene-evening.mp4" type="video/mp4">
+                <img src="assets/images/scene-evening.webp" alt="Warm 2700K ambient luxury living room at night">
+              </video>
+            </div>
+
+            <!-- Optical Overlays: Vignette & Ambient Scene Glow -->
+            <div class="cinematic-vignette" aria-hidden="true"></div>
+            <div class="cinematic-ambient-glow" id="hero-ambient-glow" aria-hidden="true"></div>
+
+            <!-- Interactive Device Hotspots -->
+            <div class="hotspots-layer" id="hotspots-layer"></div>
+
+            <div class="scene-interaction-hint">
+              <span>✦ Switch scenes above • Hover to explore smart hotspots</span>
+            </div>
+
+            <div class="scene-caption">
+              <span id="hero-caption-left">01 / MORNING AWAKENING</span>
+              <span id="hero-caption-right">DAYLIGHT &amp; MOTORIZED SHADING SYNCHRONIZATION</span>
+            </div>
           </div>
 
-          <div class="scene-caption">
-            <span>01 / MORNING AWAKENING</span>
-            <span>DAYLIGHT SYNCHRONIZATION</span>
+          <!-- Floating HUD Status Cards with 3D Depth -->
+          <div class="floating-card floating-status" id="hero-status-card">
+            <span class="status-icon">✦</span>
+            <div>
+              <small>SYSTEM STATUS</small>
+              <strong id="hero-status-pill">Morning Harmony<br><small style="font-weight:400;color:#6b7280;letter-spacing:0">Curtains open • Daylight active</small></strong>
+            </div>
+            <span class="status-check">✓</span>
           </div>
-        </div>
 
-        <!-- Floating HUD Status Cards -->
-        <div class="floating-card floating-status">
-          <span class="status-icon">✦</span>
-          <div>
-            <small>SYSTEM STATUS</small>
-            <strong>Morning Harmony<br><small style="font-weight:400;color:#6b7280;letter-spacing:0">Curtains open • Daylight active</small></strong>
-          </div>
-          <span class="status-check">✓</span>
-        </div>
-
-        <div class="floating-card floating-temp">
-          <span class="temp-icon">◌</span>
-          <div>
-            <small>CLIMATE CORE</small>
-            <strong>22° Comfort</strong>
+          <div class="floating-card floating-temp" id="hero-temp-card">
+            <span class="temp-icon">◌</span>
+            <div>
+              <small>CLIMATE CORE</small>
+              <strong id="hero-temp-pill">22° Comfort</strong>
+            </div>
           </div>
         </div>
       </div>
@@ -239,10 +264,10 @@
         <div class="experience-image" id="experience-showcase">
           <!-- Background Cross-fade Container -->
           <div class="experience-slides">
-            <img class="experience-slide active" data-scene="morning" src="assets/images/scenario-morning.webp" alt="Morning natural sunlight in luxury smart bedroom" loading="lazy">
-            <img class="experience-slide" data-scene="cinema" src="assets/images/scenario-movie.webp" alt="Cosy luxury living room cinema evening with ambilight" loading="lazy">
-            <img class="experience-slide" data-scene="away" src="assets/images/scenario-leaving.webp" alt="Front entrance of automated modern home with perimeter security" loading="lazy">
-            <img class="experience-slide" data-scene="evening" src="assets/images/scenario-night.webp" alt="Warm 2700K ambient living room lighting at night" loading="lazy">
+            <img class="experience-slide active" data-scene="morning" src="assets/images/scene-morning.webp" alt="Morning natural sunlight in luxury smart bedroom" loading="lazy">
+            <img class="experience-slide" data-scene="cinema" src="assets/images/scene-cinema.webp" alt="Cosy luxury living room cinema evening with ambilight" loading="lazy">
+            <img class="experience-slide" data-scene="away" src="assets/images/scene-away.webp" alt="Front entrance of automated modern home with perimeter security" loading="lazy">
+            <img class="experience-slide" data-scene="evening" src="assets/images/scene-evening.webp" alt="Warm 2700K ambient living room lighting at night" loading="lazy">
           </div>
 
           <div class="image-shade"></div>
@@ -256,7 +281,7 @@
             </span>
             <div class="showcase-actions">
               <a href="#top" class="showcase-3d-jump" title="Scroll up to inspect 3D architectural model reacting">
-                <span>Inspect in 3D</span>
+                <span>Experience in Hero</span>
                 <span class="jump-arrow">↗</span>
               </a>
               <span class="image-index" id="showcase-index">01 / 04</span>
@@ -411,7 +436,7 @@
 
         <!-- 03: Home Theatre Automation -->
         <article class="solution-card">
-          <img src="assets/images/scenario-movie.webp" alt="Automated luxury home cinema and media room" loading="lazy">
+          <img src="assets/images/scene-cinema.webp" alt="Automated luxury home cinema and media room" loading="lazy">
           <div class="solution-overlay"></div>
           <div class="solution-content">
             <span>03 / ENTERTAINMENT</span>
@@ -508,7 +533,7 @@
 
       <div class="day-cards">
         <article class="day-card">
-          <img src="assets/images/scenario-morning.webp" alt="Morning natural sunlight in bedroom" loading="lazy">
+          <img src="assets/images/scene-morning.webp" alt="Morning natural sunlight in bedroom" loading="lazy">
           <div>
             <small>07:00 AM / MORNING ROUTINE</small>
             <h3>Wake Up Naturally</h3>
@@ -517,7 +542,7 @@
         </article>
 
         <article class="day-card">
-          <img src="assets/images/scenario-movie.webp" alt="Cosy living room cinema evening" loading="lazy">
+          <img src="assets/images/scene-cinema.webp" alt="Cosy living room cinema evening" loading="lazy">
           <div>
             <small>08:30 PM / ENTERTAINMENT</small>
             <h3>Instant Cinema Retreat</h3>
@@ -526,7 +551,7 @@
         </article>
 
         <article class="day-card">
-          <img src="assets/images/scenario-leaving.webp" alt="Front entrance of automated modern home" loading="lazy">
+          <img src="assets/images/scene-away.webp" alt="Front entrance of automated modern home" loading="lazy">
           <div>
             <small>09:00 AM / AWAY MODE</small>
             <h3>Leave With Total Confidence</h3>

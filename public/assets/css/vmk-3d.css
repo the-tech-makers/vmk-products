@@ -543,34 +543,172 @@ img {
 .scene-frame {
   height: min(560px, 50vw);
   min-height: 420px;
-  background: #c6cebe;
+  background: #0f1612;
   border-radius: 6px;
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
-  cursor: grab;
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  perspective: 1200px;
+  transform-style: preserve-3d;
 }
 
-.scene-frame:active {
-  cursor: grabbing;
-}
-
-#home-scene {
+/* Cinematic Video Stage */
+.cinematic-stage {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  display: block;
-  position: relative;
+  overflow: hidden;
+  border-radius: inherit;
+  transform-origin: center center;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.cinematic-video-wrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
   z-index: 1;
 }
 
-.scene-fallback {
+.cinematic-video-wrap.active {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.cinematic-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cinematic-vignette {
   position: absolute;
   inset: 0;
-  background: url('../images/smart-home-hero.webp') center/cover no-repeat;
-  z-index: 0;
+  background: 
+    radial-gradient(circle at center, transparent 35%, rgba(14, 20, 16, 0.5) 100%),
+    linear-gradient(180deg, rgba(14, 20, 16, 0.4) 0%, transparent 22%, transparent 70%, rgba(14, 20, 16, 0.7) 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.cinematic-ambient-glow {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.65;
+  transition: background 0.85s ease, opacity 0.85s ease;
+}
+
+/* Hotspots Layer & Indicators */
+.hotspots-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: auto;
+}
+
+.hotspot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+}
+
+.hotspot-trigger {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(14, 20, 16, 0.78);
+  border: 1.5px solid rgba(200, 234, 83, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lime);
+  font-size: 13px;
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.hotspot-pulse {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid var(--lime);
+  opacity: 0.8;
+  animation: hotspotPulse 2.4s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none;
+}
+
+@keyframes hotspotPulse {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.hotspot:hover .hotspot-trigger,
+.hotspot.pinned .hotspot-trigger {
+  transform: scale(1.18);
+  background: var(--ink);
+  box-shadow: 0 0 0 4px rgba(200, 234, 83, 0.3), 0 8px 20px rgba(0, 0, 0, 0.6);
+}
+
+.hotspot-tooltip {
+  position: absolute;
+  left: 40px;
+  top: 50%;
+  transform: translateY(-50%) translateX(-6px);
+  background: rgba(14, 20, 16, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 8px 14px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
   opacity: 0;
-  transition: opacity 0.5s ease;
+  visibility: hidden;
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+  z-index: 12;
+}
+
+.hotspot:hover .hotspot-tooltip,
+.hotspot.pinned .hotspot-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
+}
+
+.hotspot-tooltip strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.hotspot-tooltip small {
+  display: block;
+  font-size: 10px;
+  color: #d1d5db;
+  margin-top: 2px;
 }
 
 .scene-caption {

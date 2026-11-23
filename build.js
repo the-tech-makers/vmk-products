@@ -22,13 +22,9 @@ function copyAssets() {
     // Copy JS
     const srcJsDir = path.join(SRC_DIR, "js");
     const destJsDir = path.join(PUBLIC_DIR, "assets", "js");
-
     if (fs.existsSync(srcJsDir)) {
-        if (!fs.existsSync(destJsDir)) {
-            fs.mkdirSync(destJsDir, { recursive: true });
-        }
-        const files = fs.readdirSync(srcJsDir);
-        for (const file of files) {
+        if (!fs.existsSync(destJsDir)) fs.mkdirSync(destJsDir, { recursive: true });
+        for (const file of fs.readdirSync(srcJsDir)) {
             fs.copyFileSync(path.join(srcJsDir, file), path.join(destJsDir, file));
             console.log(`✓ js/${file} → public/assets/js/${file}`);
         }
@@ -37,16 +33,34 @@ function copyAssets() {
     // Copy CSS
     const srcCssDir = path.join(SRC_DIR, "css");
     const destCssDir = path.join(PUBLIC_DIR, "assets", "css");
-
     if (fs.existsSync(srcCssDir)) {
-        if (!fs.existsSync(destCssDir)) {
-            fs.mkdirSync(destCssDir, { recursive: true });
-        }
-        const files = fs.readdirSync(srcCssDir);
-        for (const file of files) {
-            if (file === "input.css") continue; // Processed by Tailwind
+        if (!fs.existsSync(destCssDir)) fs.mkdirSync(destCssDir, { recursive: true });
+        for (const file of fs.readdirSync(srcCssDir)) {
+            if (file === "input.css") continue;
             fs.copyFileSync(path.join(srcCssDir, file), path.join(destCssDir, file));
             console.log(`✓ css/${file} → public/assets/css/${file}`);
+        }
+    }
+
+    // Copy Videos
+    const srcVidDir = path.join(SRC_DIR, "assets", "videos");
+    const destVidDir = path.join(PUBLIC_DIR, "assets", "videos");
+    if (fs.existsSync(srcVidDir)) {
+        if (!fs.existsSync(destVidDir)) fs.mkdirSync(destVidDir, { recursive: true });
+        for (const file of fs.readdirSync(srcVidDir)) {
+            fs.copyFileSync(path.join(srcVidDir, file), path.join(destVidDir, file));
+            console.log(`✓ videos/${file} → public/assets/videos/${file}`);
+        }
+    }
+
+    // Copy Images
+    const srcImgDir = path.join(SRC_DIR, "assets", "images");
+    const destImgDir = path.join(PUBLIC_DIR, "assets", "images");
+    if (fs.existsSync(srcImgDir)) {
+        if (!fs.existsSync(destImgDir)) fs.mkdirSync(destImgDir, { recursive: true });
+        for (const file of fs.readdirSync(srcImgDir)) {
+            fs.copyFileSync(path.join(srcImgDir, file), path.join(destImgDir, file));
+            console.log(`✓ images/${file} → public/assets/images/${file}`);
         }
     }
 }
