@@ -24,7 +24,7 @@ function initHomeScene() {
     scene.add(new THREE.HemisphereLight('#f7f5e9', '#64715d', 2.0));
     const sun = new THREE.DirectionalLight('#fff0d4', 3.2);
     sun.position.set(-5, 9, 6); sun.castShadow = true; sun.shadow.mapSize.set(1024,1024); scene.add(sun);
-    const ambientGlow = new THREE.PointLight('#d5f36a', 0, 8); ambientGlow.position.set(0,3,0); scene.add(ambientGlow);
+    const ambientGlow = new THREE.PointLight('#d5f36a', 0, 10); ambientGlow.position.set(0,3,0); scene.add(ambientGlow);\n    const accentLight = new THREE.PointLight('#e8f6bd', 1.1, 13); accentLight.position.set(-2.8,2.2,1.6); scene.add(accentLight);\n    const windowLight = new THREE.PointLight('#d8e9d5', .8, 10); windowLight.position.set(3.2,2.4,-.4); scene.add(windowLight);
 
     const mat = (color, roughness=.75, metalness=0) => new THREE.MeshStandardMaterial({color,roughness,metalness});
     const floorMat = mat('#c8cbbd'), wallMat = mat('#e8e5d9'), darkMat = mat('#343d35'), woodMat = mat('#a77d58'), fabricMat = mat('#d7d0bd');
@@ -74,7 +74,7 @@ function initHomeScene() {
     block(house,'light strip',[5.8,.025,.035],[0,.16,-2.72],stripMat,false);
     house.rotation.y=-.12;
 
-    const state = { scene:'morning', targetX:0, targetY:0, curtains:0 };
+    const state = { scene:'morning', targetX:0, targetY:0, curtains:0, curtainTarget:0, cameraX:8, cameraY:6.8, cameraZ:10 };\n    const floaters = new THREE.Group(); scene.add(floaters);\n    const moteMaterial = new THREE.MeshBasicMaterial({color:'#f2f7df',transparent:true,opacity:.48});\n    for(let i=0;i<34;i++){const mote=new THREE.Mesh(new THREE.SphereGeometry(.018+(i%3)*.008,8,8),moteMaterial);mote.position.set((Math.random()-.5)*8,.35+Math.random()*3.2,(Math.random()-.5)*5.5);mote.userData={phase:Math.random()*Math.PI*2,speed:.12+Math.random()*.22};floaters.add(mote);}
     function applyScene(mode) {
       state.scene=mode;
       const presets = {
@@ -102,7 +102,7 @@ function initHomeScene() {
     canvas.parentElement.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();pointerX=((e.clientX-r.left)/r.width-.5);pointerY=((e.clientY-r.top)/r.height-.5);});
     canvas.parentElement.addEventListener('pointerleave',()=>{pointerX=0;pointerY=0;});
     const clock=new THREE.Clock();
-    function render(){const t=clock.getElapsedTime();house.rotation.y=-.12+Math.sin(t*.22)*.035+pointerX*.055;house.rotation.x=pointerY*-.025;camera.position.y=6.8+Math.sin(t*.3)*.08;camera.lookAt(0,1.05,0);renderer.render(scene,camera);requestAnimationFrame(render);}
+    function render(){const t=clock.getElapsedTime();\n      house.rotation.y=-.12+Math.sin(t*.2)*.045+pointerX*.09;house.rotation.x=pointerY*-.035;house.position.y=Math.sin(t*.65)*.045;\n      state.curtains=THREE.MathUtils.damp(state.curtains,state.curtainTarget,2.4,1/60);\n      curtainL.position.z=THREE.MathUtils.lerp(-1.1,-2.35,state.curtains);curtainR.position.z=THREE.MathUtils.lerp(1.15,2.35,state.curtains);\n      const orbit=t*.075;const desiredX=8+Math.sin(orbit)*.75+pointerX*.55;const desiredZ=10+Math.cos(orbit)*.5;\n      state.cameraX=THREE.MathUtils.damp(state.cameraX,desiredX,1.3,1/60);state.cameraY=THREE.MathUtils.damp(state.cameraY,6.8+Math.sin(t*.38)*.18+pointerY*-.25,1.4,1/60);state.cameraZ=THREE.MathUtils.damp(state.cameraZ,desiredZ,1.3,1/60);\n      camera.position.set(state.cameraX,state.cameraY,state.cameraZ);camera.lookAt(Math.sin(t*.11)*.16,1.05,0);\n      floaters.children.forEach(m=>{m.position.y=.35+((m.position.y-.35+Math.sin(t*m.userData.speed+m.userData.phase)*.001+3.8)%3.8);m.position.x+=Math.sin(t*.2+m.userData.phase)*.0008;});\n      ambientGlow.intensity=ambientGlow.intensity;renderer.render(scene,camera);requestAnimationFrame(render);}
     render();
     if(fallback) fallback.style.opacity='0';
   } catch(error) {
