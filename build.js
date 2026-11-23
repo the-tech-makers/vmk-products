@@ -19,6 +19,7 @@ if (!fs.existsSync(PUBLIC_DIR)) {
 }
 
 function copyAssets() {
+    // Copy JS
     const srcJsDir = path.join(SRC_DIR, "js");
     const destJsDir = path.join(PUBLIC_DIR, "assets", "js");
 
@@ -30,6 +31,22 @@ function copyAssets() {
         for (const file of files) {
             fs.copyFileSync(path.join(srcJsDir, file), path.join(destJsDir, file));
             console.log(`✓ js/${file} → public/assets/js/${file}`);
+        }
+    }
+
+    // Copy CSS
+    const srcCssDir = path.join(SRC_DIR, "css");
+    const destCssDir = path.join(PUBLIC_DIR, "assets", "css");
+
+    if (fs.existsSync(srcCssDir)) {
+        if (!fs.existsSync(destCssDir)) {
+            fs.mkdirSync(destCssDir, { recursive: true });
+        }
+        const files = fs.readdirSync(srcCssDir);
+        for (const file of files) {
+            if (file === "input.css") continue; // Processed by Tailwind
+            fs.copyFileSync(path.join(srcCssDir, file), path.join(destCssDir, file));
+            console.log(`✓ css/${file} → public/assets/css/${file}`);
         }
     }
 }
